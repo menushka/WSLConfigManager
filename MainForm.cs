@@ -1,6 +1,7 @@
-using System;
+using System.Management;
+using System.Diagnostics;
 using System.IO;
-using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 namespace WSLConfigManager
 {
@@ -35,6 +36,9 @@ namespace WSLConfigManager
 
             // Initialize the notify icon
             this.notifyIcon1.ContextMenuStrip = this.contextMenuStrip;
+
+            LoadMaxValuesForSliders();
+            LoadWSLConfig();
 
             this.Load += new EventHandler(MainForm_Load);
         }
@@ -87,19 +91,154 @@ namespace WSLConfigManager
             processorsValue.Text = processorsSlider.Value.ToString();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void saveButton_Click(object sender, EventArgs e)
         {
-            string configPath = userHomeDirectory + configFile;
-            if (!File.Exists(configPath))
+            this.SaveWSLConfig();
+            this.Hide();
+        }
+
+        private void saveAndRestartButton_Click(object sender, EventArgs e)
+        {
+            this.SaveWSLConfig();
+            this.RestartWSL();
+            this.Hide();
+        }
+
+        private void LoadWSLConfig()
+        {
+            // Get the path to the .wslconfig file in the user's home directory
+            string wslConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".wslconfig");
+
+            // Check if the .wslconfig file exists
+            if (File.Exists(wslConfigPath))
             {
-                using (StreamWriter sw = File.CreateText(configPath))
+                // Read the content of the .wslconfig file
+                string content = File.ReadAllText(wslConfigPath);
+
+                // Use regex to parse the values for memory and processors
+                var memoryRegex = new Regex(@"memory=(\d+)GB");
+                var processorsRegex = new Regex(@"processors=(\d+)");
+
+                var memoryMatch = memoryRegex.Match(content);
+                var processorsMatch = processorsRegex.Match(content);
+
+                if (memoryMatch.Success)
                 {
-                    sw.WriteLine("[wsl2]");
-                    sw.WriteLine("# Default options");
-                    sw.WriteLine("# memory=4GB");
-                    sw.WriteLine("# processors=2");
+                    int memoryValue = int.Parse(memoryMatch.Groups[1].Value);
+                    memorySlider.Value = memoryValue;
+                }
+
+                if (processorsMatch.Success)
+                {
+                    int processorsValue = int.Parse(processorsMatch.Groups[1].Value);
+                    processorsSlider.Value = processorsValue;
+                }
+
+                // Update the labels to show the loaded values
+                memoryValue.Text = memorySlider.Value.ToString();
+                processorsValue.Text = processorsSlider.Value.ToString();
+
+                // Parse and set other options here based on your input components
+            }
+        }
+
+        private void SaveWSLConfig()
+        {
+            // Generate the content based on the input components
+            string content = $"# Settings apply across all Linux distros running on WSL 2\n" +
+                             $"[wsl2]\n" +
+                             $"\n" +
+                             $"# Limits VM memory to use no more than {memorySlider.Value} GB\n" +
+                             $"memory={memorySlider.Value}GB\n" +
+                             $"\n" +
+                             $"# Sets the VM to use {processorsSlider.Value} virtual processors\n" +
+                             $"processors={processorsSlider.Value}\n";
+
+            // Add other options here based on your input components
+
+            // Get the path to the .wslconfig file in the user's home directory
+            string wslConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".wslconfig");
+
+            // Save the content to the .wslconfig file, overriding any existing content
+            File.WriteAllText(wslConfigPath, content);
+        }
+
+        private void LoadMaxValuesForSliders()
+        {
+            ulong maxMemoryKB = GetTotalMemory();
+            int maxVirtualProcessors = GetProcessorCores();
+
+            // Convert the memory from KB to GB
+            int maxMemoryGB = (int)Math.Ceiling((double)maxMemoryKB / 1024 / 1024);
+
+            // Set the maximum value of the sliders
+            memorySlider.Maximum = maxMemoryGB;
+            processorsSlider.Maximum = maxVirtualProcessors;
+
+            // Set the initial value of the sliders
+            memorySlider.Value = 4; // Example default value
+            processorsSlider.Value = 2; // Example default value
+
+            // Update the labels to show the initial values
+            memoryValue.Text = memorySlider.Value.ToString();
+            processorsValue.Text = processorsSlider.Value.ToString();
+        }
+
+        private ulong GetTotalMemory()
+        {
+            ObjectQuery query = new ObjectQuery("SELECT TotalVisibleMemorySize FROM Win32_OperatingSystem");
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
+
+            foreach (ManagementObject mo in searcher.Get())
+            {
+                ulong totalMemory = (ulong)mo["TotalVisibleMemorySize"];
+                return totalMemory;
+            }
+
+            return 0;
+        }
+
+        private int GetProcessorCores()
+        {
+            ObjectQuery query = new ObjectQuery("SELECT NumberOfCores FROM Win32_Processor");
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
+
+            int totalCores = 0;
+
+            foreach (ManagementObject mo in searcher.Get())
+            {
+                totalCores += (int)(uint)mo["NumberOfCores"];
+            }
+
+            return totalCores;
+        }
+
+        private void RestartWSL()
+        {
+            KillAllWSLInstances();
+            StartWSLInstance();
+        }
+
+        private void KillAllWSLInstances()
+        {
+            Process[] wslProcesses = Process.GetProcessesByName("wsl");
+            foreach (Process process in wslProcesses)
+            {
+                try
+                {
+                    process.Kill();
+                }
+                catch (Exception ex)
+                {
+                    // Handle any exceptions that may occur during the process killing
+                    Console.WriteLine("Error killing process: " + ex.Message);
                 }
             }
+        }
+
+        private void StartWSLInstance()
+        {
+            Process.Start("wsl.exe");
         }
     }
 }
