@@ -31,17 +31,8 @@
             processorsLabel = new Label();
             processorsSlider = new TrackBar();
             processorsValue = new Label();
-            kernelLabel = new Label();
-            kernelTextbox = new TextBox();
-            kernelCommandLineLabel = new Label();
-            kernelCommandLineTextbox = new TextBox();
-            swapLabel = new Label();
-            swapTextbox = new TextBox();
-            pageReportingCheckbox = new CheckBox();
-            localhostForwardingCheckbox = new CheckBox();
-            nestedVirtualizationCheckbox = new CheckBox();
-            debugConsoleCheckbox = new CheckBox();
             saveButton = new Button();
+            saveAndRestartButton = new Button();
             ((System.ComponentModel.ISupportInitialize)memorySlider).BeginInit();
             ((System.ComponentModel.ISupportInitialize)processorsSlider).BeginInit();
             SuspendLayout();
@@ -69,8 +60,7 @@
             memorySlider.Size = new Size(175, 45);
             memorySlider.TabIndex = 1;
             memorySlider.Value = 4;
-            memorySlider.ValueChanged += new System.EventHandler(memorySlider_ValueChanged);
-
+            memorySlider.ValueChanged += memorySlider_ValueChanged;
             // 
             // memoryValue
             // 
@@ -97,7 +87,7 @@
             processorsSlider.Size = new Size(175, 45);
             processorsSlider.TabIndex = 4;
             processorsSlider.Value = 2;
-            processorsSlider.ValueChanged += new System.EventHandler(processorsSlider_ValueChanged);
+            processorsSlider.ValueChanged += processorsSlider_ValueChanged;
             // 
             // processorsValue
             // 
@@ -107,109 +97,33 @@
             processorsValue.TabIndex = 5;
             processorsValue.Text = "2";
             // 
-            // kernelLabel
-            // 
-            kernelLabel.Location = new Point(9, 94);
-            kernelLabel.Name = "kernelLabel";
-            kernelLabel.Size = new Size(70, 22);
-            kernelLabel.TabIndex = 6;
-            kernelLabel.Text = "Kernel:";
-            // 
-            // kernelTextbox
-            // 
-            kernelTextbox.Location = new Point(88, 94);
-            kernelTextbox.Name = "kernelTextbox";
-            kernelTextbox.Size = new Size(176, 23);
-            kernelTextbox.TabIndex = 7;
-            // 
-            // kernelCommandLineLabel
-            // 
-            kernelCommandLineLabel.Location = new Point(9, 131);
-            kernelCommandLineLabel.Name = "kernelCommandLineLabel";
-            kernelCommandLineLabel.Size = new Size(131, 22);
-            kernelCommandLineLabel.TabIndex = 8;
-            kernelCommandLineLabel.Text = "Kernel Command Line:";
-            // 
-            // kernelCommandLineTextbox
-            // 
-            kernelCommandLineTextbox.Location = new Point(149, 131);
-            kernelCommandLineTextbox.Name = "kernelCommandLineTextbox";
-            kernelCommandLineTextbox.Size = new Size(176, 23);
-            kernelCommandLineTextbox.TabIndex = 9;
-            // 
-            // swapLabel
-            // 
-            swapLabel.Location = new Point(9, 169);
-            swapLabel.Name = "swapLabel";
-            swapLabel.Size = new Size(70, 22);
-            swapLabel.TabIndex = 10;
-            swapLabel.Text = "Swap:";
-            // 
-            // swapTextbox
-            // 
-            swapTextbox.Location = new Point(88, 169);
-            swapTextbox.Name = "swapTextbox";
-            swapTextbox.Size = new Size(176, 23);
-            swapTextbox.TabIndex = 11;
-            // 
-            // pageReportingCheckbox
-            // 
-            pageReportingCheckbox.Location = new Point(9, 206);
-            pageReportingCheckbox.Name = "pageReportingCheckbox";
-            pageReportingCheckbox.Size = new Size(131, 22);
-            pageReportingCheckbox.TabIndex = 12;
-            pageReportingCheckbox.Text = "Page Reporting";
-            // 
-            // localhostForwardingCheckbox
-            // 
-            localhostForwardingCheckbox.Location = new Point(9, 244);
-            localhostForwardingCheckbox.Name = "localhostForwardingCheckbox";
-            localhostForwardingCheckbox.Size = new Size(149, 22);
-            localhostForwardingCheckbox.TabIndex = 13;
-            localhostForwardingCheckbox.Text = "Localhost Forwarding";
-            // 
-            // nestedVirtualizationCheckbox
-            // 
-            nestedVirtualizationCheckbox.Location = new Point(9, 281);
-            nestedVirtualizationCheckbox.Name = "nestedVirtualizationCheckbox";
-            nestedVirtualizationCheckbox.Size = new Size(149, 22);
-            nestedVirtualizationCheckbox.TabIndex = 14;
-            nestedVirtualizationCheckbox.Text = "Nested Virtualization";
-            // 
-            // debugConsoleCheckbox
-            // 
-            debugConsoleCheckbox.Location = new Point(9, 319);
-            debugConsoleCheckbox.Name = "debugConsoleCheckbox";
-            debugConsoleCheckbox.Size = new Size(131, 22);
-            debugConsoleCheckbox.TabIndex = 15;
-            debugConsoleCheckbox.Text = "Debug Console";
-            // 
             // saveButton
             // 
-            saveButton.Location = new Point(241, 333);
+            saveButton.Location = new Point(9, 102);
             saveButton.Name = "saveButton";
-            saveButton.Size = new Size(100, 30);
+            saveButton.Size = new Size(332, 30);
             saveButton.TabIndex = 16;
             saveButton.Text = "Save";
             saveButton.UseVisualStyleBackColor = true;
-            saveButton.Click += button1_Click;
+            saveButton.Click += saveButton_Click;
+            // 
+            // saveAndRestartButton
+            // 
+            saveAndRestartButton.Location = new Point(9, 138);
+            saveAndRestartButton.Name = "saveAndRestartButton";
+            saveAndRestartButton.Size = new Size(332, 30);
+            saveAndRestartButton.TabIndex = 17;
+            saveAndRestartButton.Text = "Save and Restart WSL";
+            saveAndRestartButton.UseVisualStyleBackColor = true;
+            saveAndRestartButton.Click += saveAndRestartButton_Click;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(350, 375);
+            ClientSize = new Size(350, 180);
+            Controls.Add(saveAndRestartButton);
             Controls.Add(saveButton);
-            Controls.Add(debugConsoleCheckbox);
-            Controls.Add(nestedVirtualizationCheckbox);
-            Controls.Add(localhostForwardingCheckbox);
-            Controls.Add(pageReportingCheckbox);
-            Controls.Add(swapTextbox);
-            Controls.Add(swapLabel);
-            Controls.Add(kernelCommandLineTextbox);
-            Controls.Add(kernelCommandLineLabel);
-            Controls.Add(kernelTextbox);
-            Controls.Add(kernelLabel);
             Controls.Add(processorsValue);
             Controls.Add(processorsSlider);
             Controls.Add(processorsLabel);
@@ -235,16 +149,8 @@
         private Label processorsLabel;
         private TrackBar processorsSlider;
         private Label processorsValue;
-        private Label kernelLabel;
-        private TextBox kernelTextbox;
-        private Label kernelCommandLineLabel;
-        private TextBox kernelCommandLineTextbox;
-        private Label swapLabel;
-        private TextBox swapTextbox;
-        private CheckBox pageReportingCheckbox;
-        private CheckBox localhostForwardingCheckbox;
-        private CheckBox nestedVirtualizationCheckbox;
-        private CheckBox debugConsoleCheckbox;
         private Button saveButton;
+        private Button saveAndRestartButton;
     }
+
 }
