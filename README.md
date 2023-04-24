@@ -2,6 +2,8 @@
 
 WSLConfigManager is a lightweight Windows status bar application that allows users to easily manage the properties of their WSL 2 configuration file (`.wslconfig`).
 
+![cover](./preview.png)
+
 ## Features
 
 - Easy-to-use GUI for managing WSL 2 configuration
